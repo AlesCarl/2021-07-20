@@ -110,6 +110,85 @@ public class YelpDao {
 			return null;
 		}
 	}
+
+	//vertici
+	public List<User> getAllUsersRecensioni(int nRecensioni) {
+		
+		String sql = "select  u.* , count(r.`review_id`) as cn "
+				+ "from  reviews r, users u "
+				+ "where r.`user_id` = u.`user_id` "
+				+ "group by u.`user_id` "
+				+ "having cn >= ? "
+				+ "order by cn asc";
+		
+// RAGGRUPPA tutti gli USERS e conta quante REVIEW ha fatto ciascuno di essi.
+		
+		List<User> result = new ArrayList<User>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, nRecensioni);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				User user = new User(res.getString("user_id"),
+						res.getInt("votes_funny"),
+						res.getInt("votes_useful"),
+						res.getInt("votes_cool"),
+						res.getString("name"),
+						res.getDouble("average_stars"),
+						res.getInt("review_count"));
+				
+				result.add(user);
+			}
+			res.close();
+			st.close();
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	
+	}
+
+	public List<String> getRecensioniAnno(int anno, User u) {
+		
+		String sql = "select  r.`business_id` "
+				+ "from  reviews r "
+				+ "where YEAR(r.`review_date`)= ? "
+				+ "and r.`user_id`= ? ";
+		
+// RAGGRUPPA tutti gli USERS e conta quante REVIEW ha fatto ciascuno di essi.
+		
+		List<String> result = new ArrayList<String>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, anno);
+			st.setString(2, u.getUserId());
+			ResultSet res = st.executeQuery();
+			
+			while (res.next()) {
+			
+				result.add(res.getString("r.business_id"));
+			}
+			res.close();
+			st.close();
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	
+	}
 	
 	
 }
