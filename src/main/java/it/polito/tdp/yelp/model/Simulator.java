@@ -76,6 +76,7 @@ public class Simulator {
 			listDaIntervistare.remove(u);
 			mapIntervistati.put(t, 1);
 			giorniTrascorsi++;
+			
 		}
 	}
 
