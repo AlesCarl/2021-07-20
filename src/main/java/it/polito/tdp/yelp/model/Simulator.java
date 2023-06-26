@@ -19,7 +19,7 @@ public class Simulator {
 
 	
 	//paramentri di INPUT: 
-    private int intervistatori; 
+    private int intervistatori  ; 
     private int userDaIntervistare;
     
     List<User> listDaIntervistare; 
