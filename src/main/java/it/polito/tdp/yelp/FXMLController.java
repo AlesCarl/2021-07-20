@@ -57,18 +57,34 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
-    	int anno= this.cmbAnno.getValue(); 
-    	int nRecensioni= Integer.parseInt(this.txtN.getText());
+    	Integer anno= null; 
+    	Integer nRecensioni=  null; 
     	
+    	anno= this.cmbAnno.getValue(); 
+    	
+    	if(anno==null) {
+    		this.txtResult.appendText("Seleziona valore di anno");
+    	}
+    	
+    	
+    	try {
+    		nRecensioni= Integer.parseInt(this.txtN.getText());
+    		
+    	} catch(NumberFormatException e) {
+    		this.txtResult.appendText("Invalid argument ,  must be a nonnegative integer!");
+    		return;
+    	}
+
+    
     	model.creaGrafo(nRecensioni, anno);
-    	
-    	this.txtResult.appendText("VERTICI E ARCHI: "+model.getVertici()+" -- "+model.getNumEdges());
-    	
-    	// try catch ... 
-    	
+    	this.txtResult.appendText("VERTICI E ARCHI: "+model.getVertici()+" -- "+model.getEdge());
+
     	this.cmbUtente.getItems().addAll(model.getVerticiCmb()); 
     	
     }
+    
+    
+    
 
     @FXML
     void doUtenteSimile(ActionEvent event) {
@@ -76,32 +92,32 @@ public class FXMLController {
     	User u= this.cmbUtente.getValue(); 
 
     	this.txtResult.appendText("\n\ngrado massimo: "+model.getGradoSimilarita(u));
-    	
-    	for(User uu: model.getListSimilarita()) {
-        	this.txtResult.appendText("\n"+uu);
-
-    	}
-    	
+//    	
+//    	for(User uu: model.getListSimilarita()) {
+//        	this.txtResult.appendText("\n"+uu);
+//
+//    	}
+//    	
     	
     }
     
     @FXML
     void doSimula(ActionEvent event) {
     	
-    	int intervistarori= Integer.parseInt(this.txtX1.getText());
-    	int userIntervistare= Integer.parseInt(this.txtX1.getText()); 
-    	int cont=0; 
-    	
-    	this.txtResult.appendText("\nGiorni per concludere analisi mercato:"+model.getGiorniTrascorsiSim());
-    	
-    	this.txtResult.appendText("\nUtenti intervistati da ciascun intervistatore");
-
-    	
-    	for(int i: model.simula(intervistarori, userIntervistare).values()) {
-    		this.txtResult.appendText("\nIntervistatore "+cont++ +"ha intervistato questo numero di utenti: "+i);
-    	}
-    	
-    	
+//    	int intervistarori= Integer.parseInt(this.txtX1.getText());
+//    	int userIntervistare= Integer.parseInt(this.txtX1.getText()); 
+//    	int cont=0; 
+//    	
+//    	this.txtResult.appendText("\nGiorni per concludere analisi mercato:"+model.getGiorniTrascorsiSim());
+//    	
+//    	this.txtResult.appendText("\nUtenti intervistati da ciascun intervistatore");
+//
+//    	
+//    	for(int i: model.simula(intervistarori, userIntervistare).values()) {
+//    		this.txtResult.appendText("\nIntervistatore "+cont++ +"ha intervistato questo numero di utenti: "+i);
+//    	}
+//    	
+//    	
 
     }
     

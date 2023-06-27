@@ -1,8 +1,10 @@
 package it.polito.tdp.yelp.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -37,134 +39,159 @@ public class Model {
  		}
 	
 	 public void creaGrafo( int nRecensioni, int anno) {
-		 
-		 
 		 loadAllNodes(nRecensioni); 
-	 		//System.out.println("size: " +this.allNACode.size());
+		 
 
- 		 /** VERTICI */
 	    	Graphs.addAllVertices(this.graph, allUtenti);
-	 		System.out.println("NUMERO vertici GRAFO: " +this.graph.vertexSet().size());
-	 		System.out.println("vertici GRAFO: " +this.graph.vertexSet());
-	 		
-	 		
-	 		/** ARCHI */
+	 		System.out.println("vertici GRAFO: " +this.graph.vertexSet().size());
 	 		
 	 		/*
-	 		 almeno una volta, essi abbiano pubblicato una recensione per uno stesso locale 
-	 		 commerciale nell’anno a selezionato	 		 
-	 		*/
+	 		 
+	arco se almeno una volta, essi abbiano pubblicato una recensione 
+	per uno stesso locale commerciale nell’anno a selezionato. 
+	
+	Il peso dell’arco, sempre positivo, è dato dal numero di 
+	volte che questo accade, e rappresenta il grado di similarità 
+	tra i due utenti coinvolti. 
+	 		   
+	 		 */
 	 		
-	 		for(User u1: this.allUtenti) {
- 	 			for(User u2: this.allUtenti) {
- 	 				
- 	 				if(u1.getUserId().compareTo(u2.getUserId())!=0) { 
- 	 					double peso= calcoloPeso(u1,u2,anno); 
- 	 			 
- 	 			 				if( peso>0) {
- 	 			 					
- 	 		 						Graphs.addEdgeWithVertices(this.graph, u1, u2, peso);
- 	 		 						
- 	 		        }
- 	 			}
- 	 		}
-    	 }
-	 		System.out.println("NUMERO ARCHI GRAFO: " +this.graph.edgeSet().size());
-	
-	 }
-	 
-	
-	 
-	 public double getGradoSimilarita(User u) {
-		 
-		 double gradoMax=0; 
-		 listGradoSimilarita.clear();
-		 
-		 for(DefaultWeightedEdge e: this.graph.outgoingEdgesOf(u) ) {
-				
-				User uu= Graphs.getOppositeVertex(this.graph, e, u);
-				
-				if( this.graph.getEdgeWeight(e) ==gradoMax ) {
-					listGradoSimilarita.add(uu);
-				}
-				
-				if( this.graph.getEdgeWeight(e) > gradoMax ) {
-					
-					listGradoSimilarita.clear();
-					gradoMax= this.graph.getEdgeWeight(e); 
-					listGradoSimilarita.add(uu);
-					
-				}
-		 }
-		 
-		 return gradoMax; 
-	 }
-	 
+	 		
+	 // dato un user prendi elenco di tutte le review nell' ANNO
+	 		
+	 		for(User s1: allUtenti) {
+	 			for(User s2: allUtenti) {
+	 				
+	 				if(!s1.equals(s2)) { 
+	 		
+	 					
+	 				double peso= gradoSimilarita(s1,s2,anno); 
+	 				if(peso>0) {
+						Graphs.addEdgeWithVertices(this.graph, s1, s2, peso);
+						//this.listPesi.add(peso); //abbastanza inutile, usa i GRAFI
+	 				}
+	 			}
+	 				
+	 		  }
+	 		}
+			System.out.println("\nnumero ARCHI: "+ this.graph.edgeSet().size());
 
-	 public List<User> getListSimilarita() {
-		return listGradoSimilarita;
+		 
+		 
 	 }
 
+	 // prendo tutte le review di user in un anno
 	 
-	 
-
-	private double calcoloPeso(User u1, User u2, int anno) {		
-// calcolo le recensioni nell'anno  di  ciascun  utente 
+	private double gradoSimilarita(User s1, User s2,int  anno) {
+		List<Business> list1= dao.getAllReviewsUser(anno, s1);
+		List<Business> list2= dao.getAllReviewsUser(anno, s2);
 		
+		double cont= 0; 
 		
-		List<String> listRec1= dao.getRecensioniAnno(anno, u1);
-		List<String> listRec2= dao.getRecensioniAnno(anno,u2);
-
-		double contatore=0.0; 
-		
-		for(String s1:listRec1 ) {
-			for(String s2:listRec2 ) {
-				if(s1.compareTo(s2)==0) {
-					contatore++; 
-				}	
+		for(Business r1: list1) {
+			for(Business r2: list2) {
+				if(r1.getBusinessId().compareTo(r2.getBusinessId())==0)
+				   cont++; 
 			}
+			
 		}
-		
-		return contatore;
+
+		return cont; // grado di similarità
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	public int getVertici() {
-		return graph.vertexSet().size();
+		return this.graph.vertexSet().size();
 	}
-    
-	public int getNumEdges() {
-	     return graph.edgeSet().size(); 
-	 }
-	
-	public List<User> getVerticiCmb() {
-		return this.allUtenti; 
+	public int getEdge() {
+		return this.graph.edgeSet().size();
 	}
-	
-	
-	
 
+	public List<User> getVerticiCmb() {
+		Collections.sort(allUtenti);
+		return this.allUtenti;
+	}
+
+	
+	
+	//stampare, l’utente collegato più simile ad u, ovvero quello 
+	// con grado di similarità maggiore. In caso ci sia più di un utente che 
+	// abbia lo stesso grado di similarità con u, stamparli tutti.
+	
+	public List<User> getGradoSimilarita(User u) {
+		
+		
+		List<User> uMax= new ArrayList<>(); 
+		double pesoMax= 0; 
+		
+		for( DefaultWeightedEdge ee: this.graph.outgoingEdgesOf(u)) {
+			
+			if(this.graph.getEdgeWeight(ee)== pesoMax) {
+				uMax.add(Graphs.getOppositeVertex(this.graph, ee, u)); 
+
+			}
+			
+			if(this.graph.getEdgeWeight(ee)>pesoMax) {
+				uMax.clear();
+				pesoMax= this.graph.getEdgeWeight(ee); 
+				uMax.add(Graphs.getOppositeVertex(this.graph, ee, u)); 
+				
+			}
+		}
+		
+		
+		return uMax;
+	}
+		
+	
+	
+	
 
 /***************  COLLEGA SIMULAZIONE E MODEL   **************/ 
-public  Map<Integer, Integer>  simula(int intervistarori, int userIntervistare ) 
+public  void simula(int x1, int x2 ) 
 {
-		
-	Simulator sim = new Simulator(this.graph, intervistarori,userIntervistare);
+	Simulator2 sim = new Simulator2(this.graph, x1,x2);
 	
 	sim.initialize();
 	sim.run();
 	
-	giorniTrascorsiSim= sim.getGiorniTrascorsiSim();
-	
-	return sim.getSimulationMap(); 
-	
+//	return sim.getIdMapTotShare(); 
+	//this.nPassiSimulatore= sim.getnPassi();
+	//return sim.getStanziali() ;
 }
 
+
+
 	
-	public int getGiorniTrascorsiSim() {
-		return giorniTrascorsiSim; 
-	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

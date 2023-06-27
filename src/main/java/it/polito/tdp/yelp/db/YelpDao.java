@@ -111,17 +111,13 @@ public class YelpDao {
 		}
 	}
 
-	//vertici
 	public List<User> getAllUsersRecensioni(int nRecensioni) {
 		
-		String sql = "select  u.* , count(r.`review_id`) as cn "
-				+ "from  reviews r, users u "
-				+ "where r.`user_id` = u.`user_id` "
+		String sql = "select u.*, count(r.`review_id`)as cn "
+				+ "from Users u, Reviews r "
+				+ "where u.`user_id`= r.`user_id` "
 				+ "group by u.`user_id` "
-				+ "having cn >= ? "
-				+ "order by cn asc";
-		
-// RAGGRUPPA tutti gli USERS e conta quante REVIEW ha fatto ciascuno di essi.
+				+ "having cn >= ? ";
 		
 		List<User> result = new ArrayList<User>();
 		Connection conn = DBConnect.getConnection();
@@ -151,31 +147,42 @@ public class YelpDao {
 			e.printStackTrace();
 			return null;
 		}
-		
-	
 	}
 
-	public List<String> getRecensioniAnno(int anno, User u) {
+	public List<Business> getAllReviewsUser(int anno, User s1) {
 		
-		String sql = "select  r.`business_id` "
-				+ "from  reviews r "
-				+ "where YEAR(r.`review_date`)= ? "
-				+ "and r.`user_id`= ? ";
+		String sql = "select distinct b.* "
+				+ "from  Reviews r, Business b "
+				+ "where  year(r.`review_date`) = ? "
+				+ " and b.`business_id`= r.`business_id` and "
+				+ " r.`user_id`= ? "; 
+
 		
-// RAGGRUPPA tutti gli USERS e conta quante REVIEW ha fatto ciascuno di essi.
-		
-		List<String> result = new ArrayList<String>();
+		List<Business> result = new ArrayList<>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(2, s1.getUserId());
 			st.setInt(1, anno);
-			st.setString(2, u.getUserId());
 			ResultSet res = st.executeQuery();
 			
 			while (res.next()) {
+				
+				Business business = new Business(res.getString("business_id"), 
+						res.getString("full_address"),
+						res.getString("active"),
+						res.getString("categories"),
+						res.getString("city"),
+						res.getInt("review_count"),
+						res.getString("business_name"),
+						res.getString("neighborhoods"),
+						res.getDouble("latitude"),
+						res.getDouble("longitude"),
+						res.getString("state"),
+						res.getDouble("stars"));
+				result.add(business);	
 			
-				result.add(res.getString("r.business_id"));
 			}
 			res.close();
 			st.close();
@@ -186,9 +193,6 @@ public class YelpDao {
 			e.printStackTrace();
 			return null;
 		}
-		
-	
 	}
-	
-	
+
 }
