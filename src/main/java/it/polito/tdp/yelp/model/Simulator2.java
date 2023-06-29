@@ -23,7 +23,7 @@ public class Simulator2 {
     
     //Stato del sistema:
    	private SimpleWeightedGraph<User, DefaultWeightedEdge> graph;
-   //	private Map <String,Integer> numShare;  
+   //private Map <String,Integer> numShare;  
 	int contUserIntervistati;
 
    	
@@ -31,11 +31,10 @@ public class Simulator2 {
   //paramentri di OUTPUT: 
 	int giorniTotali=0; 
 	private Map <Integer,Integer> userIntervistati;  
-	   // key: idGiornalisti, values: contUserIntervistati
+	
+ // #key: idGiornalisti, #values: contUserIntervistati
 
 
-   	
-   	
   //coda eventi
   	private PriorityQueue<Event2> queue; 
   	
@@ -121,7 +120,7 @@ public class Simulator2 {
 						User newUser= gradoSimilaritaMaggiore(u); 
 						
 						if(newUser==null) {
-							// sciglie a caso ytra list verici   
+							// sceglie a caso tra list vertici   
 							 newUser= getCasuale() ; 
 						}
 						this.queue.add(new Event2(EventType.INTERVISTA, intervistatore,newUser, giorno+1));
@@ -136,17 +135,15 @@ public class Simulator2 {
 					if(prob<= 0.8) {
 						// intervista fatta e ferie
 						this.queue.add(new Event2(EventType.PAUSA, intervistatore,u, giorno+1));
-
 					}
+					
 					
 					
 					if(prob<= 1) {
 						// intervista da ripetere ... 
 						this.queue.add(new Event2(EventType.INTERVISTA, intervistatore,u, giorno+1));
-
-					
-
 					 }
+					
 					
 				 break;
 				 
@@ -161,16 +158,13 @@ public class Simulator2 {
 							// sceglie a caso ytra list verici   
 							 newUser= getCasuale() ; 
 						}
+						
 					this.queue.add(new Event2(EventType.INTERVISTA, intervistatore,newUser, giorno+1));
 					listVertici.remove(newUser);
 					contUserIntervistati++; 
 					userIntervistati.put(intervistatore, this.userIntervistati.get(intervistatore)+1); 
-
-					
-				
+			
 				}
-				
-				
 	 }
    	
 	}
@@ -200,7 +194,6 @@ public class Simulator2 {
 		  }
 			
 		}
-		
 		// se c'è piu di un vertice con grado max
 		if(listUsMax.size()>1) {
 			usMax= getCasuale(listUsMax) ; 

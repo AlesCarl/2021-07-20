@@ -21,7 +21,6 @@ public class Simulator {
 	//paramentri di INPUT: 
     private int intervistatori  ; 
     private int userDaIntervistare;
-    
     List<User> listDaIntervistare; 
 	
 	
@@ -41,6 +40,7 @@ public class Simulator {
 	private PriorityQueue<Event> queue; 
     
 		 
+	
 	
 	public Simulator(SimpleWeightedGraph<User, DefaultWeightedEdge> graph, int intervistatori, int userDaIntervistare) {
 		

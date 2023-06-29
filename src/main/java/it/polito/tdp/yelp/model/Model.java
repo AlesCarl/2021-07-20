@@ -83,6 +83,7 @@ public class Model {
 	 // prendo tutte le review di user in un anno
 	 
 	private double gradoSimilarita(User s1, User s2,int  anno) {
+		
 		List<Business> list1= dao.getAllReviewsUser(anno, s1);
 		List<Business> list2= dao.getAllReviewsUser(anno, s2);
 		
@@ -99,15 +100,6 @@ public class Model {
 		return cont; // grado di similarità
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
